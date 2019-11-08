@@ -48,7 +48,7 @@ class Track {
         if let asset = self.record?["image"] as? CKAsset {
             let imageData: Data
             do {
-                imageData = try Data(contentsOf: asset.fileURL)
+                imageData = try Data(contentsOf: asset.fileURL!)
             } catch {
                 debugPrint("Error: \(error)")
                 return
@@ -56,17 +56,17 @@ class Track {
             
             // Copy image data to local dir
             let fm = FileManager.default
-            let fileName = asset.fileURL.lastPathComponent
+            let fileName = asset.fileURL!.lastPathComponent
             let localURL = Utility.getCoverImagesDirectory().appendingPathComponent(fileName, isDirectory: false)
             do {
-                try fm.copyItem(at: asset.fileURL, to: localURL)
+                try fm.copyItem(at: asset.fileURL!, to: localURL)
             } catch {
                 debugPrint("Error: \(error)")
                 return
             }
             
             self.imageName = localURL.lastPathComponent
-            debugPrint("localURL: \(asset.fileURL)")
+            debugPrint("localURL: \(asset.fileURL!)")
             self.image = UIImage(data: imageData)
         }
     }
@@ -154,7 +154,7 @@ class Track {
         if let asset = self.record?["image"] as? CKAsset {
             let imageData: Data
             do {
-                imageData = try Data(contentsOf: asset.fileURL)
+                imageData = try Data(contentsOf: asset.fileURL!)
             } catch {
                 debugPrint("Error: \(error)")
                 return
@@ -162,17 +162,17 @@ class Track {
             
             // Copy image data to local dir
             let fm = FileManager.default
-            let fileName = asset.fileURL.lastPathComponent
+            let fileName = asset.fileURL!.lastPathComponent
             let localURL = Utility.getCoverImagesDirectory().appendingPathComponent(fileName, isDirectory: false)
             do {
-                try fm.copyItem(at: asset.fileURL, to: localURL)
+                try fm.copyItem(at: asset.fileURL!, to: localURL)
             } catch {
                 debugPrint("Error: \(error)")
                 return
             }
             
             self.imageName = localURL.lastPathComponent
-            debugPrint("localURL: \(asset.fileURL)")
+            debugPrint("localURL: \(asset.fileURL!)")
             self.image = UIImage(data: imageData)
         }
     }

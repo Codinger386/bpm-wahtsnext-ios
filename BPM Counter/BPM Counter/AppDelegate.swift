@@ -14,7 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         if UserDefaults.standard.bool(forKey: "subscribedToChanges") == false {
             TrackDatabase.shared.subscribeToChanges()
@@ -38,7 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         debugPrint("Received remote notification")
         
         let dict = userInfo as! [String: NSObject]
-        let notification = CKNotification(fromRemoteNotificationDictionary: dict)
+        let notification = CKNotification(fromRemoteNotificationDictionary: dict)!
         if (notification.subscriptionID == "track-changes") {
             TrackDatabase.shared.fetchSharedChanges {
                 completionHandler(UIBackgroundFetchResult.newData)

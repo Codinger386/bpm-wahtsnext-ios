@@ -54,9 +54,9 @@ class CreateTrackViewController: UIViewController, UITextFieldDelegate, UIImageP
             imageView.layer.borderWidth = 1
             
             self.artistTextField.attributedPlaceholder = NSAttributedString(string: "Artist",
-                                                                            attributes: [NSForegroundColorAttributeName: #colorLiteral(red: 0.5902686686, green: 0.5952289095, blue: 0.5952289095, alpha: 1) ])
+                                                                            attributes: convertToOptionalNSAttributedStringKeyDictionary([convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor): #colorLiteral(red: 0.5902686686, green: 0.5952289095, blue: 0.5952289095, alpha: 1) ]))
             self.titleTextField.attributedPlaceholder = NSAttributedString(string: "Title",
-                                                                           attributes: [NSForegroundColorAttributeName: #colorLiteral(red: 0.5902686686, green: 0.5952289095, blue: 0.5952289095, alpha: 1) ])
+                                                                           attributes: convertToOptionalNSAttributedStringKeyDictionary([convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor): #colorLiteral(red: 0.5902686686, green: 0.5952289095, blue: 0.5952289095, alpha: 1) ]))
             if let bpm = detectedBPM {
                 self.bpmTextField.text = String(format: "%.2f", bpm)
             } else {
@@ -197,9 +197,12 @@ class CreateTrackViewController: UIViewController, UITextFieldDelegate, UIImageP
     
     //MARK: - UIImagePickerControllerDelegate
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+// Local variable inserted by Swift 4.2 migrator.
+let info = convertFromUIImagePickerControllerInfoKeyDictionary(info)
+
         
-        if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+        if let pickedImage = info[convertFromUIImagePickerControllerInfoKey(UIImagePickerController.InfoKey.originalImage)] as? UIImage {
             
             // crop and resize
             let resizedImage = pickedImage.resizedImage(minEdgeLength: 200)
@@ -214,4 +217,25 @@ class CreateTrackViewController: UIViewController, UITextFieldDelegate, UIImageP
         
         picker.dismiss(animated: true, completion: nil)
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromUIImagePickerControllerInfoKeyDictionary(_ input: [UIImagePickerController.InfoKey: Any]) -> [String: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map {key, value in (key.rawValue, value)})
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
+	guard let input = input else { return nil }
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSAttributedString.Key(rawValue: key), value)})
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
+	return input.rawValue
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromUIImagePickerControllerInfoKey(_ input: UIImagePickerController.InfoKey) -> String {
+	return input.rawValue
 }

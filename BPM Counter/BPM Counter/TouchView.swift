@@ -35,6 +35,4 @@ class TouchView: UIView {
         delegate?.touchViewTouchEnded(touchView: self)
         
     }
-    
-
 }

@@ -23,8 +23,8 @@ class TintTextField: UITextField {
     }
     
     func setupTintColor() {
-        clearButtonMode = UITextFieldViewMode.always
-        borderStyle = UITextBorderStyle.roundedRect
+        clearButtonMode = UITextField.ViewMode.always
+        borderStyle = UITextField.BorderStyle.roundedRect
         layer.cornerRadius = 8.0
         layer.masksToBounds = true
         layer.borderColor = tintColor.cgColor

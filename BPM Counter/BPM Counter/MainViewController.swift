@@ -68,25 +68,25 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
 //        TrackDatabase.shared.add(track: test)
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.dataBaseDidUpdate), name: .trackDatabaseDidChange, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.applicationDidBecomeActive), name: .UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.applicationDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
         
         self.tableView.reloadData()
         self.refreshData()
     }
     
-    func hideExplanation(recognizer: UITapGestureRecognizer) {
+    @objc func hideExplanation(recognizer: UITapGestureRecognizer) {
         UIView.animate(withDuration: 0.4, animations: {
             self.explenationLayer.alpha = 0
         }) { finished in
             self.explenationLayer.isHidden = true
-            self.view.sendSubview(toBack: self.explenationLayer)
+            self.view.sendSubviewToBack(self.explenationLayer)
             self.explenationLayer.removeGestureRecognizer(recognizer)
             UserDefaults.standard.set(true, forKey: "explanationShown")
             UserDefaults.standard.synchronize()
         }
     }
     
-    func applicationDidBecomeActive(notification: Notification) {
+    @objc func applicationDidBecomeActive(notification: Notification) {
         // Yeah doing the refresh
         self.refreshData()
     }
@@ -110,10 +110,10 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
             
             TrackDatabase.shared.updateFromCloud(completion: { error in
-                if error != nil {
+                if let error = error {
                     debugPrint("Error: \(error)")
                     
-                    if let code = error?.code {
+                    if let code = (error as NSError?)?.code {
                         debugPrint("code: \(code)")
                         if code == 9 {
                             
@@ -156,7 +156,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         
     }
     
-    internal func swipeLeft(tab: UISwipeGestureRecognizer) {
+    @objc internal func swipeLeft(tab: UISwipeGestureRecognizer) {
         debugPrint("swipe")
         
         detectedBPM = 0
@@ -164,7 +164,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         lastTap = 0
     }
     
-    func dataBaseDidUpdate(notification: Notification) {
+    @objc func dataBaseDidUpdate(notification: Notification) {
         self.tableView.reloadData()
     }
     
@@ -178,7 +178,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             let newDifference = abs(detectedBPM - track.bpm)
             debugPrint("minimumDifference \(minimumDifference) newDifference \(newDifference)")
             if newDifference > minimumDifference {
-                if let index = allTracks.index(where: { theTrack -> Bool in
+                if let index = allTracks.firstIndex(where: { theTrack -> Bool in
                     theTrack === track
                 }) {
                     tableView.scrollToRow(at: IndexPath(row: index, section: 0), at: .middle, animated: true)

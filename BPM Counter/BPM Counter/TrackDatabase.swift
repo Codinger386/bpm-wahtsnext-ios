@@ -98,7 +98,7 @@ public class TrackDatabase {
             let timeStamp = NSDate.timeIntervalSinceReferenceDate
             let newImageName = "\(timeStamp).jpg"
             
-            if let data = UIImageJPEGRepresentation(image, 1.0) {
+            if let data = image.jpegData(compressionQuality: 1.0) {
                 let fileURL = Utility.getCoverImagesDirectory().appendingPathComponent("\(newImageName)")
                 do {
                     try data.write(to: fileURL)
@@ -133,7 +133,7 @@ public class TrackDatabase {
             let timeStamp = NSDate.timeIntervalSinceReferenceDate
             let newImageName = "\(timeStamp).jpg"
             
-            if let data = UIImageJPEGRepresentation(image, 1.0) {
+            if let data = image.jpegData(compressionQuality: 1.0) {
                 let fileURL = Utility.getCoverImagesDirectory().appendingPathComponent("\(newImageName)")
                 do {
                     try data.write(to: fileURL)
@@ -160,7 +160,7 @@ public class TrackDatabase {
         
         // 1. Remove from local store and delete image if no cloud entry available
         if track.cloudID == nil {
-            if let index = tracks.index(where: { theTrack -> Bool in
+            if let index = tracks.firstIndex(where: { theTrack -> Bool in
                 theTrack === track
             }) {
                 
@@ -199,12 +199,12 @@ public class TrackDatabase {
             if track.cloudID != nil {
                 
                 if track.deleted {
-                    let operation = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: [CKRecordID(recordName: track.cloudID!)])
+                    let operation = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: [CKRecord.ID(recordName: track.cloudID!)])
                     operation.modifyRecordsCompletionBlock = { records, recordIDs, error in
-                        if error != nil {
+                        if let error = error {
                             debugPrint("Error: \(error)")
                         } else {
-                            if let index = self.tracks.index(where: { theTrack -> Bool in
+                            if let index = self.tracks.firstIndex(where: { theTrack -> Bool in
                                 theTrack === track
                             }) {
                                 self.tracks.remove(at: index)
@@ -233,7 +233,7 @@ public class TrackDatabase {
                     
                     let operation = CKModifyRecordsOperation(recordsToSave: [trackRecord], recordIDsToDelete: nil)
                     operation.modifyRecordsCompletionBlock = { records, recordIDs, error in
-                        if error != nil {
+                        if let error = error {
                             debugPrint("Error: \(error)")
                         } else {
                             track.updated = false
@@ -249,7 +249,7 @@ public class TrackDatabase {
             } else { // Track doesn't exist in cloud
                 
                 let cloudID = "\(Date.timeIntervalSinceReferenceDate)"
-                let trackID = CKRecordID(recordName: cloudID)
+                let trackID = CKRecord.ID(recordName: cloudID)
                 let trackRecord = CKRecord(recordType: "Track", recordID: trackID)
                 trackRecord["artist"] = track.artist as NSString
                 trackRecord["title"] = track.title as NSString
@@ -266,7 +266,7 @@ public class TrackDatabase {
                 
                 let operation = CKModifyRecordsOperation(recordsToSave: [trackRecord], recordIDsToDelete: nil)
                 operation.modifyRecordsCompletionBlock = { records, recordIDs, error in
-                    if error != nil {
+                    if let error = error {
                         debugPrint("Error: \(error)")
                         track.cloudID = nil
                     }
@@ -394,13 +394,13 @@ public class TrackDatabase {
         
         let subscription = CKDatabaseSubscription(subscriptionID: "track-changes")
         
-        let notificationInfo = CKNotificationInfo()
+        let notificationInfo = CKSubscription.NotificationInfo()
         notificationInfo.shouldSendContentAvailable = true
         subscription.notificationInfo = notificationInfo
         
         privateDB.save(subscription) { subscription, error in
             guard error == nil else {
-                debugPrint("Error: \(error)")
+                debugPrint("Error: \(error!)")
                 return
             }
             debugPrint("Subscribed to changes")
@@ -437,7 +437,7 @@ public class TrackDatabase {
         
         self.updateFromCloud { error in
             
-            if error != nil {
+            if let error = error {
                 debugPrint("Error: \(error)")
             } else {
                 self.updateTrackList()
